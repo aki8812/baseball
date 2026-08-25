@@ -17,7 +17,7 @@
     (function () {
       try {
         const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
-        location.replace(mobile ? 'mobile/index.html' : 'desktop/index.html');
+        location.replace(mobile ? 'mobile/' : 'desktop/');
       } catch (err) {}
     })();
   </script>
@@ -25,8 +25,8 @@
 <body>
   <div class="box">
     <p>正在前往投球模擬器</p>
-    <a href="desktop/index.html">電腦版</a>
-    <a href="mobile/index.html">手機版</a>
+    <a href="desktop/">電腦版</a>
+    <a href="mobile/">手機版</a>
   </div>
 </body>
 </html>
