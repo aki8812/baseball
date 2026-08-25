@@ -4,6 +4,14 @@
   <meta charset="utf-8">
   <title>棒球投球模擬</title>
   <link rel="icon" href="../favicon.ico">
+  <script>
+    (function () {
+      try {
+        const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+        if (mobile) location.replace('../mobile/index.html');
+      } catch (err) {}
+    })();
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #070b12; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -390,53 +398,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     akiFavicon.rel = 'icon';
     akiFavicon.href = '../favicon.ico';
     document.head.appendChild(akiFavicon);
-    const akiFont = document.createElement('link');
-    akiFont.rel = 'stylesheet';
-    akiFont.href = 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap';
-    document.head.appendChild(akiFont);
-    const akiFootCss = document.createElement('style');
-    akiFootCss.textContent = '#aki-footer{position:fixed;bottom:20px;right:20px;color:#ffeb3b;font-weight:bold;font-size:1rem;font-family:\'Roboto Mono\',monospace;cursor:default;user-select:none;display:flex;gap:2px;z-index:2147483647;pointer-events:auto}.char-span{display:inline-block;transition:transform .1s ease-out;will-change:transform}';
-    document.head.appendChild(akiFootCss);
-    const akiFoot = document.createElement('div');
-    akiFoot.id = 'aki-footer';
-    akiFoot.textContent = 'Made by Aki';
-    document.body.appendChild(akiFoot);
-    (function(){
-      const footer = document.getElementById('aki-footer');
-      if (!footer) return;
-      const text = footer.textContent;
-      footer.textContent = '';
-      const spans = [];
-      for (const char of text) {
-        const span = document.createElement('span');
-        span.textContent = char;
-        if (char === ' ') span.style.width = '0.5em';
-        span.className = 'char-span';
-        footer.appendChild(span);
-        spans.push(span);
-      }
-      document.addEventListener('mousemove', function(e) {
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        spans.forEach(function(span) {
-          const rect = span.getBoundingClientRect();
-          const charX = rect.left + rect.width / 2;
-          const charY = rect.top + rect.height / 2;
-          const distX = mouseX - charX;
-          const distY = mouseY - charY;
-          const distance = Math.sqrt(distX * distX + distY * distY);
-          const maxDist = 60;
-          if (distance < maxDist && distance > 0) {
-            const force = (maxDist - distance) / maxDist;
-            const moveX = -(distX / distance) * force * 10;
-            const moveY = -(distY / distance) * force * 10;
-            span.style.transform = 'translate(' + moveX + 'px, ' + moveY + 'px)';
-          } else {
-            span.style.transform = 'translate(0, 0)';
-          }
-        });
-      });
-    })();
 
     setTimeout(function() {
       akiVeil.style.opacity = '0';
