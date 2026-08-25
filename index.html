@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>棒球投球模擬</title>
+  <link rel="icon" href="favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; background: #070b12; color: #eef2f7; font-family: 'Microsoft JhengHei', sans-serif; display: flex; align-items: center; justify-content: center; }
+    .box { text-align: center; padding: 28px; }
+    a { color: #e3b23c; text-decoration: none; margin: 0 12px; font-size: 15px; }
+    a:hover { color: #f3ca69; }
+    p { color: #7d8ba1; margin-bottom: 18px; font-size: 14px; }
+  </style>
+  <script>
+    (function () {
+      try {
+        const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+        location.replace(mobile ? 'mobile/index.html' : 'desktop/index.html');
+      } catch (err) {}
+    })();
+  </script>
+</head>
+<body>
+  <div class="box">
+    <p>正在前往投球模擬器</p>
+    <a href="desktop/index.html">電腦版</a>
+    <a href="mobile/index.html">手機版</a>
+  </div>
+</body>
+</html>
