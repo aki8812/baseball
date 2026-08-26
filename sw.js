@@ -1,5 +1,5 @@
-const CACHE_NAME = 'aki-baseball-v3';
-const CORE_ASSETS = ['/', '/manifest.json', '/favicon.ico', '/icon-192x192.png', '/icon-512x512.png', '/apple-touch-icon.png'];
+const CACHE_NAME = 'aki-baseball-v4';
+const CORE_ASSETS = ['/', '/manifest.json', '/favicon.ico', '/icon/icon-512x512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
