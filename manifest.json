@@ -2,7 +2,7 @@
   "name": "Baseball",
   "short_name": "Baseball",
   "description": "3D 棒球投球軌跡模擬器，可調整球種、轉速與縫線角度。",
-  "start_url": "/",
+  "start_url": "/mobile/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
