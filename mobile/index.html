@@ -42,8 +42,11 @@
           'inner ' + innerWidth + ' x ' + innerHeight,
           'screen ' + screen.width + ' x ' + screen.height,
           'dpr ' + devicePixelRatio,
-          'appH ' + document.documentElement.style.getPropertyValue('--app-h'),
-          'rootH ' + (document.querySelector('#dc-root .sc-host > div') ? Math.round(document.querySelector('#dc-root .sc-host > div').getBoundingClientRect().height) : 'na'),
+          'client ' + document.documentElement.clientWidth + ' x ' + document.documentElement.clientHeight,
+          'vv ' + (window.visualViewport ? Math.round(window.visualViewport.height) : 'na'),
+          'cover ' + (((document.querySelector('meta[name="viewport"]') || {}).content || '').indexOf('viewport-fit') >= 0),
+          'rootH ' + (document.querySelector('#dc-root') ? Math.round(document.querySelector('#dc-root').getBoundingClientRect().height) : 'na'),
+          'canvasH ' + (document.querySelector('canvas') ? Math.round(document.querySelector('canvas').getBoundingClientRect().height) : 'na'),
           'safeBottom ' + safeBottom,
           'standalone ' + (navigator.standalone === true) + ' / ' + matchMedia('(display-mode: standalone)').matches,
           'sw ' + (navigator.serviceWorker && navigator.serviceWorker.controller ? 'on' : 'off')
@@ -52,11 +55,16 @@
         document.body.appendChild(box);
       };
       let timer = null;
+      let ox = 0, oy = 0;
       const clear = function () { if (timer) { clearTimeout(timer); timer = null; } };
       const start = function (x, y) {
         if (x > 90 || y < innerHeight - 90) return;
         clear();
-        timer = setTimeout(show, 1200);
+        ox = x; oy = y;
+        timer = setTimeout(show, 1000);
+      };
+      const move = function (x, y) {
+        if (Math.abs(x - ox) > 30 || Math.abs(y - oy) > 30) clear();
       };
       const opts = { passive: true, capture: true };
       window.addEventListener('pointerdown', function (e) { start(e.clientX, e.clientY); }, opts);
@@ -64,31 +72,42 @@
         const t = e.touches[0];
         if (t) start(t.clientX, t.clientY);
       }, opts);
-      ['pointerup', 'pointercancel', 'pointermove', 'touchend', 'touchmove', 'touchcancel'].forEach(function (ev) {
+      window.addEventListener('pointermove', function (e) { move(e.clientX, e.clientY); }, opts);
+      window.addEventListener('touchmove', function (e) {
+        const t = e.touches[0];
+        if (t) move(t.clientX, t.clientY);
+      }, opts);
+      ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (ev) {
         window.addEventListener(ev, clear, opts);
       });
     })();
   </script>
   <script>
     (function () {
-      const CSS = 'html,body{height:var(--app-h,100dvh)!important;min-height:var(--app-h,100dvh)!important;overflow:hidden}'
-        + '#dc-root,#dc-root>.sc-host{height:var(--app-h,100dvh)!important}'
-        + '#dc-root .sc-host>div{height:var(--app-h,100dvh)!important}';
+      const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
+      const CSS = 'html,body{height:100%!important;min-height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#070b12!important}'
+        + '#dc-root{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;height:auto!important;width:auto!important}'
+        + '#dc-root>.sc-host{height:100%!important;width:100%!important}'
+        + '#dc-root .sc-host>div{height:100%!important;min-height:100%!important}';
       const ensure = function () {
         const doc = document;
-        if (!doc.head) return;
-        let tag = doc.getElementById('aki-fit');
-        if (!tag) {
-          tag = doc.createElement('style');
+        const head = doc.head;
+        if (!head) return;
+        let meta = doc.querySelector('meta[name="viewport"]');
+        if (!meta) {
+          meta = doc.createElement('meta');
+          meta.setAttribute('name', 'viewport');
+          meta.setAttribute('content', VIEWPORT);
+          head.appendChild(meta);
+        } else if (meta.getAttribute('content') !== VIEWPORT) {
+          meta.setAttribute('content', VIEWPORT);
+        }
+        if (!doc.getElementById('aki-fit')) {
+          const tag = doc.createElement('style');
           tag.id = 'aki-fit';
           tag.textContent = CSS;
-          doc.head.appendChild(tag);
+          head.appendChild(tag);
         }
-        const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-        if (!h) return;
-        const px = Math.round(h) + 'px';
-        const root = doc.documentElement;
-        if (root.style.getPropertyValue('--app-h') !== px) root.style.setProperty('--app-h', px);
       };
       ensure();
       ['resize', 'orientationchange', 'pageshow', 'focus', 'load', 'DOMContentLoaded'].forEach(function (ev) {
