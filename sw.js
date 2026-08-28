@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aki-baseball-v11';
+const CACHE_NAME = 'aki-baseball-v12';
 const CORE_ASSETS = ['/', '/mobile/', '/manifest.json', '/favicon.ico', '/icon/icon-512x512.png'];
 
 self.addEventListener('install', (event) => {
