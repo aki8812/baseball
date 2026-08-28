@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aki-baseball-v8';
+const CACHE_NAME = 'aki-baseball-v9';
 const CORE_ASSETS = ['/', '/mobile/', '/manifest.json', '/favicon.ico', '/icon/icon-512x512.png'];
 
 self.addEventListener('install', (event) => {
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => putCopy(request, response))
-        .catch(() => caches.match(request).then((hit) => hit || caches.match('/')))
+        .catch(() => caches.match(request).then((hit) => hit || caches.match('/mobile/')))
     );
     return;
   }
