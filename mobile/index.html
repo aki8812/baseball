@@ -42,6 +42,8 @@
           'inner ' + innerWidth + ' x ' + innerHeight,
           'screen ' + screen.width + ' x ' + screen.height,
           'dpr ' + devicePixelRatio,
+          'appH ' + document.documentElement.style.getPropertyValue('--app-h'),
+          'rootH ' + (document.querySelector('#dc-root .sc-host > div') ? Math.round(document.querySelector('#dc-root .sc-host > div').getBoundingClientRect().height) : 'na'),
           'safeBottom ' + safeBottom,
           'standalone ' + (navigator.standalone === true) + ' / ' + matchMedia('(display-mode: standalone)').matches,
           'sw ' + (navigator.serviceWorker && navigator.serviceWorker.controller ? 'on' : 'off')
@@ -51,14 +53,51 @@
       };
       let timer = null;
       const clear = function () { if (timer) { clearTimeout(timer); timer = null; } };
-      document.addEventListener('touchstart', function (e) {
-        const t = e.touches[0];
-        if (!t || t.clientX > 64 || t.clientY < innerHeight - 64) return;
+      const start = function (x, y) {
+        if (x > 90 || y < innerHeight - 90) return;
         clear();
-        timer = setTimeout(show, 1500);
-      }, { passive: true });
-      document.addEventListener('touchend', clear, { passive: true });
-      document.addEventListener('touchmove', clear, { passive: true });
+        timer = setTimeout(show, 1200);
+      };
+      const opts = { passive: true, capture: true };
+      window.addEventListener('pointerdown', function (e) { start(e.clientX, e.clientY); }, opts);
+      window.addEventListener('touchstart', function (e) {
+        const t = e.touches[0];
+        if (t) start(t.clientX, t.clientY);
+      }, opts);
+      ['pointerup', 'pointercancel', 'pointermove', 'touchend', 'touchmove', 'touchcancel'].forEach(function (ev) {
+        window.addEventListener(ev, clear, opts);
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      const CSS = 'html,body{height:var(--app-h,100dvh)!important;min-height:var(--app-h,100dvh)!important;overflow:hidden}'
+        + '#dc-root,#dc-root>.sc-host{height:var(--app-h,100dvh)!important}'
+        + '#dc-root .sc-host>div{height:var(--app-h,100dvh)!important}';
+      const ensure = function () {
+        const doc = document;
+        if (!doc.head) return;
+        let tag = doc.getElementById('aki-fit');
+        if (!tag) {
+          tag = doc.createElement('style');
+          tag.id = 'aki-fit';
+          tag.textContent = CSS;
+          doc.head.appendChild(tag);
+        }
+        const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        if (!h) return;
+        const px = Math.round(h) + 'px';
+        const root = doc.documentElement;
+        if (root.style.getPropertyValue('--app-h') !== px) root.style.setProperty('--app-h', px);
+      };
+      ensure();
+      ['resize', 'orientationchange', 'pageshow', 'focus', 'load', 'DOMContentLoaded'].forEach(function (ev) {
+        window.addEventListener(ev, ensure);
+      });
+      document.addEventListener('visibilitychange', ensure);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', ensure);
+      [0, 60, 200, 600, 1200, 2500, 5000, 9000].forEach(function (d) { setTimeout(ensure, d); });
+      setInterval(ensure, 2000);
     })();
   </script>
   <style>
